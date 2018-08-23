@@ -57,3 +57,37 @@ Dev0psPadawan microservices repository
 .
 	docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db -v reddit_db:/data/db mongo:latest
 
+
+**Homework docker-4**
+1. Протестировал работу контейнера с типом сети "none" и "host"
+	Контейнер с типом сети "none":
+ 		-имеет только loopback интерфейс
+		-запускается в отдельном namespace
+		-имеет доступ только до хоста
+	Контейнер с типом сети "host":
+		-дублирует сетевые интерфейсы хоста
+		-запускается в одном namespace с хостом
+		-имеет доступ только до всех узлов, что и хост
+2. Протестировал работу контейнера с типом сети "bridge"  и использованием свойств name и network-alias
+	--name <name> (можно задать только 1 имя)
+	--network-alias <alias-name> (можно задать множество алиасов)
+
+3. Протестировал схему работы контейнеров с отдельными сетями для frontend и backend и добавлением к контейнеру сети командой:
+	docker network connect <network> <container>
+4. Командой "ifconfig | grep br -A 2" сопоставил созданные bridge сети с новыми интерфейсами на хосте.
+5. Командой "docker-machine ssh docker-host sudo sudo iptables -nvL -t nat" проверил создавайемые правила в файерволе для новых сетей.
+6. Командой "docker-machine ssh docker-host sudo sudo  ps ax | grep docker-proxy" проверил наличие процесса отвечающего за проброс порта (в нашем случае для публикации контейнера ui)
+7. Командой "pip install docker-compose" установил docker-compose на локальную машину.
+8. Скачал файл docker-compose.yml, проверил что контейнеры создаются командой "docker-compose up -d"
+9. Параметризовал docker-compose.yml с помощью переменных окружений, записанных в .env.
+10. Изучил механизм создания базового имени проекта. По умолчанию создаётся с именем родительской дерриктории, в которой лежит конекст контейнера.
+	можно изменить:
+		-директивой "container_name" в файле docker-compose.yml
+		-опцией -p <project_name> из командной строки
+11. Создал файл docker-compose.override.yml, позволяющий дополнить docker-compose.yml.
+	-для контейнеров с ruby реализована опция дебаг режима (command: "puma --debug -w 2")
+	-для всех контейнеров подключён volume в директиву /app (директива, куда копируется контекст контейнера при сборке), позволяющий изменять код каждого из приложений, не выполняя сборку образа (${SRC_PATH}/${CONTAINER_NAME}:/app).
+		-котнекст перенесён на docker-host командами:
+		 docker-machine scp -r ui docker-host:~/app_src/
+ 		 docker-machine scp -r post-py docker-host:~/app_src/
+		 docker-machine scp -r comment docker-host:~/app_src/
