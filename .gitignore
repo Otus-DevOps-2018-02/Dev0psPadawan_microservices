@@ -1,5 +1,8 @@
 hadolint/*
-*/infra/ansible/service-account.json
-*/infra/packer/variables
-*/infra/terraform/terraform.tfvarse
-*/terraform/terraform.tfstate*
+*service-account.json
+*variables
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
