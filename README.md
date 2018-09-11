@@ -91,3 +91,38 @@ Dev0psPadawan microservices repository
 		 docker-machine scp -r ui docker-host:~/app_src/
  		 docker-machine scp -r post-py docker-host:~/app_src/
 		 docker-machine scp -r comment docker-host:~/app_src/
+
+
+
+**Homework gitlab-ci-1**
+1. Создал новую ВМ gitlab-ci с помощью docker-machine:
+docker-machine create --driver google \
+ --google-project gitlab-ci-000000 \
+ --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+ --google-machine-type n1-standard-1 \
+ --google-zone europe-west1-d \
+ --google-disk-size 100 \
+ --google-tags http-server,https-server \
+ gitlab-ci 
+2. Добавил ssh-ключ:
+	yum -y install sshfs
+	docker-machine mount gitlab-ci:/home /tmp/docker-mount/ \
+	&& cat ~/.ssh/^Cpuser.pub >> /tmp/docker-mount/docker-user/.ssh/authorized_keys \
+	&& docker-machine mount gitlab-ci:/home /tmp/docker-mount/ -u
+3. Установил docker, а так же подготовил окружение с помощью ansible playbook gitlab-ci.yml
+4. В файле docker-compose заменил IP адрес:
+	sed -i 's/<YOUR-VM-IP>/104.199.51.36/' /srv/gitlab/docker-compose.yml
+5. Задеплоил Gitlab CI:
+	cd /srv/gitlab && docker-compose up -d
+6. В вэб-интерфейсе создал группу homework и проект exmple
+7. Добавил на своей рабочей станции новый репозиторий gitlab (он же проект exmple) и запушил ветку gitlab-ci-1
+	git checkout -b gitlab-ci-1
+ 	git remote add gitlab http://104.199.51.36/homework/example.git
+ 	git push gitlab gitlab-ci-1
+8. Создал pipeline .gitlab-ci.yml состоящий из 3 Stage`й и 4 Job`ов и так же запушил в репозиторий gitlab.
+9. В Gitlab CI получил токен, создал контейнер с Runner'ом и зарегистрировал Runner в Gitlab CI.
+10. Проверил коректность работы .gitlab-ci.yml на Runner'е.
+11. Добавил исходный код reddit в репозиторий и изменил описание pipeline в .gitlab-ci.yml.
+
+12. Создал ansible playbook deploy-runner.yml для развертывания и регистрации Gitlab CI Runner. Кол-во Runner'ов задаётся переменной "runners_count"
+13. Настроил интеграцию Pipeline с тестовым Slack-чатом

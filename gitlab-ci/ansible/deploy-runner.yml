@@ -1,0 +1,59 @@
+---
+- name: Install docker
+  become: true
+  hosts: runner-host
+  
+  vars:
+    gitlabci_token: wedl;kLKJijk;'lJUOUH
+    runners_count : 3
+    gitlab_ci_ip  : 104.199.51.36
+
+  tasks:
+
+  - name: Install docker dependencies
+    apt:
+        name: "{{ item }}"
+        state: present
+    with_items:
+    - "apt-transport-https"
+    - "ca-certificates"
+    - "software-properties-common"
+    - "cron"
+    - "python-pip"
+  - name: Add Docker apt key.
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+      state: present
+  - name: Add APT repository
+    apt_repository:
+      repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+      state: present
+  - name: Install docker
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+    - "docker-ce"
+    - "docker-compose"
+  - name: pip install
+    pip:
+      name: docker
+      extra_args: --upgrade
+
+  - name: Install gitlab-ci-runner containers
+    docker_container:
+      name: "{{ item }}"
+      image: gitlab/gitlab-runner:latest
+      state: started
+      restart_policy: always
+      volumes:
+      - '/srv/{{ item }}/config:/etc/gitlab-runner'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    with_sequence: start=1 end={{ runners_count }} format=runner-%02x
+
+  - name: Register runners in gitlab-ci
+    shell: 'docker exec -i {{ item }} /usr/bin/gitlab-runner register --non-interactive --executor "docker" --docker-image "alpine:latest" --url "http://{{ gitlab_ci_ip }}/" --registration-token "{{ gitlabci_token }}" --description "docker-runner" --tag-list "docker" --run-untagged --locked="false" '
+    with_sequence: start=1 end="{{ runners_count }}" format=runner-%02x
+
