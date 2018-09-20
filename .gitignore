@@ -1,5 +1,5 @@
 #gitlab-ci
-#docker-monolith
-#hadolin
-#gitlab-ci/ansible/gce.ini
-#gitlab-ci/ansible/service-account.json
+docker-monolith
+hadolin
+gitlab-ci/ansible/gce.ini
+gitlab-ci/ansible/service-account.json
