@@ -45,7 +45,7 @@ branch review:		### Этот job определяет динамическое �
     name: branch/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.example.com
   only:
-    - branches:
+    - branches
   except:
     - master 
 

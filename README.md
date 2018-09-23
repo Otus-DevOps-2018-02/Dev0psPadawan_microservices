@@ -126,3 +126,11 @@ docker-machine create --driver google \
 
 12. Создал ansible playbook deploy-runner.yml для развертывания и регистрации Gitlab CI Runner. Кол-во Runner'ов задаётся переменной "runners_count"
 13. Настроил интеграцию Pipeline с тестовым Slack-чатом
+
+
+
+**Homework gitlab-ci-2**
+1. Объявил  в pipeline окружение dev, Staging и Production.
+2. Применил директиву when, с опцией manual, для запуска джоба по кнопке из UI
+3. Применил директиву only объявляющую список условий, которые должны быть истинны, чтобы job мог запуститься
+4. Применил динамические окружения.
