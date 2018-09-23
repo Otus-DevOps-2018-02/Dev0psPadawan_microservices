@@ -40,7 +40,9 @@ deploy_dev_job:
 
 staging:
   stage: stage
-  when: manuali 	###when: manual – говорит о том, что job должен быть запущен человеком из UI
+  when: manuali 	### when: manual – говорит о том, что job должен быть запущен человеком из UI
+  only:			### Директива only описывает список условий, которые должны быть истинны, чтобы job мог запуститься.
+    - /^\d+\.\d+\.\d+	### Регулярное выражение  означает, что должен стоять semver тэг в git, например, 2.4.10
   script:
     - echo 'Deploy'
   environment:
@@ -48,7 +50,9 @@ staging:
     url: https://beta.example.com
 production:
   stage: production
-  when: manual		###when: manual – говорит о том, что job должен быть запущен человеком из UI
+  when: manual		
+  only:
+    - /^\d+\.\d+\.\d+/ 
   script:
     - echo 'Deploy'
   environment:
